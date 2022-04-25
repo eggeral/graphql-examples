@@ -39,31 +39,27 @@ public class GraphQLTests {
 
     @Test
     public void run_basic_query() {
-        WebTarget target = client.target("http://localhost:" + port).path("/graphql");
-        Response response = target
-                .queryParam("query",
-                        "{hello}".replaceAll("\\{", "%7B").replaceAll("\\}", "%7D"))
-                .request().get();
+        WebTarget target = client.target("http://localhost:" + port).path("graphql");
+
+        String query = "{flights{number}}";
+
+        Response response = target.request().post(Entity.entity(query, "application/graphql"));
         String result = response.readEntity(String.class);
         System.out.println(result);
         assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"hello\":\"world\"}}")));
+        assertThat(result, is(equalTo(
+                "{\"data\":{" +
+                        "\"flights\":[{\"number\":\"OS2001\"},{\"number\":\"LH1234\"},{\"number\":\"KM6712\"}]" +
+                        "}}"
+        )));
 
-        response = target.request().post(Entity.entity(
-                "{" +
-                        "\"query\": \"{hello}\"" +
-                        "}", MediaType.APPLICATION_JSON_TYPE));
+        query = "{flights(from:\"GRZ\"){number}}";
+
+        response = target.request().post(Entity.entity(query, "application/graphql"));
         result = response.readEntity(String.class);
         System.out.println(result);
         assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"hello\":\"world\"}}")));
-
-        response = target.request().post(Entity.entity(
-                "{hello}", "application/graphql"));
-        result = response.readEntity(String.class);
-        System.out.println(result);
-        assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"hello\":\"world\"}}")));
+        assertThat(result, is(equalTo("{\"data\":{\"flights\":[{\"number\":\"LH1234\"}]}}")));
     }
 
 }

@@ -1,0 +1,14 @@
+schema {
+    query: Query
+}
+
+type Query {
+    flights(from: String): [Flight]
+}
+
+type Flight {
+    id: ID
+    number: String
+    from: String
+    to: String
+}
