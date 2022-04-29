@@ -1,6 +1,11 @@
-query Query {
-    flights {
+mutation {
+    createFlight(flightInput: {number: "LH7689", from: "CHX", to: "AUS"}) {
+        id
+    }
+    updateFlight(id: 1, flightInput: {number: "LH7689", from: "CHX", to: "AUS"}) {
+        id
         number
         from
+        to
     }
 }

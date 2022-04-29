@@ -38,28 +38,40 @@ public class GraphQLTests {
     }
 
     @Test
-    public void run_basic_query() {
+    public void run_basic_mutation() {
         WebTarget target = client.target("http://localhost:" + port).path("graphql");
 
-        String query = "{flights{number}}";
+        String query = "mutation{createFlight(flightInput: {number: \"LH7689\", from: \"CHX\", to: \"AUS\"}) {id}}";
 
         Response response = target.request().post(Entity.entity(query, "application/graphql"));
         String result = response.readEntity(String.class);
         System.out.println(result);
         assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo(
-                "{\"data\":{" +
-                        "\"flights\":[{\"number\":\"OS2001\"},{\"number\":\"LH1234\"},{\"number\":\"KM6712\"}]" +
-                        "}}"
-        )));
+        assertThat(result, is(equalTo("{\"data\":{\"createFlight\":{\"id\":\"4\"}}}")));
 
-        query = "{flights(from:\"GRZ\"){number}}";
+        query = "{flights(from:\"CHX\"){number}}";
 
         response = target.request().post(Entity.entity(query, "application/graphql"));
         result = response.readEntity(String.class);
         System.out.println(result);
         assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"flights\":[{\"number\":\"LH1234\"}]}}")));
+        assertThat(result, is(equalTo("{\"data\":{\"flights\":[{\"number\":\"LH7689\"}]}}")));
+
+        query = "mutation{updateFlight(id: 4, flightInput: {number: \"LH7689\", from: \"CHX\", to: \"JFK\"}) {id}}";
+
+        response = target.request().post(Entity.entity(query, "application/graphql"));
+        result = response.readEntity(String.class);
+        System.out.println(result);
+        assertThat(response.getStatus(), is(200));
+        assertThat(result, is(equalTo("{\"data\":{\"updateFlight\":{\"id\":\"4\"}}}")));
+
+        query = "{flights(from:\"CHX\"){to}}";
+
+        response = target.request().post(Entity.entity(query, "application/graphql"));
+        result = response.readEntity(String.class);
+        System.out.println(result);
+        assertThat(response.getStatus(), is(200));
+        assertThat(result, is(equalTo("{\"data\":{\"flights\":[{\"to\":\"JFK\"}]}}")));
     }
 
 }

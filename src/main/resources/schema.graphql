@@ -1,14 +1,28 @@
 schema {
-    query: Query
+    # Every schema has a query type and an optional mutation type
+    query: FlightsQuery
+    mutation: FlightsMutation
 }
 
-type Query {
+type FlightsQuery {
     flights(from: String): [Flight]
 }
 
+type FlightsMutation {
+    createFlight(flightInput: FlightInput): Flight
+    updateFlight(id: ID! flightInput: FlightInput): Flight
+}
+
 type Flight {
-    id: ID
+    id: ID!
     number: String
     from: String
     to: String
 }
+
+input FlightInput {
+    number: String
+    from: String
+    to: String
+}
+
