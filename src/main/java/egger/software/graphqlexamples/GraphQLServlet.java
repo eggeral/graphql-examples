@@ -58,6 +58,15 @@ public class GraphQLServlet extends GraphQLHttpServlet {
                 .type("FlightsMutation", builder ->
                         builder.dataFetcher("updateFlight", new UpdateFlightMutation(flightsRepository))
                 )
+                .type("FlightsMutation", builder ->
+                        builder.dataFetcher("addPassenger", new AddPassengerMutation(passengersRepository))
+                )
+                .type("FlightsMutation", builder ->
+                        builder.dataFetcher("flight", new FlightDataFetcher(flightsRepository))
+                )
+                .type("FlightMutation", builder ->
+                        builder.dataFetcher("addPassenger", new AddPassengerToFlightMutation(passengersRepository))
+                )
                 .build();
 
         SchemaGenerator schemaGenerator = new SchemaGenerator();

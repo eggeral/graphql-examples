@@ -10,7 +10,18 @@ type FlightsQuery {
 type FlightsMutation {
     createFlight(flightInput: FlightInput): Flight
     updateFlight(id: ID! flightInput: FlightInput): Flight
+    addPassenger(flightId: ID!, passengerInput: PassengerInput): Passenger
+    flight(number: String): FlightMutation
 }
+
+type FlightMutation {
+    addPassenger(passengerInput: PassengerInput): Passenger
+}
+
+input PassengerInput {
+    name:  String
+}
+
 
 type Flight {
     id: ID!

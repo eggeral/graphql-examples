@@ -49,29 +49,56 @@ public class GraphQLTests {
         assertThat(response.getStatus(), is(200));
         assertThat(result, is(equalTo("{\"data\":{\"createFlight\":{\"id\":\"4\"}}}")));
 
-        query = "{flights(from:\"CHX\"){number}}";
+        query = "mutation {\n" +
+                "    addPassenger(flightId: 4,passengerInput: {\n" +
+                "        name: \"Helga Kirschbaum\"\n" +
+                "    }) {\n" +
+                "        id\n" +
+                "    }\n" +
+                "}";
 
         response = target.request().post(Entity.entity(query, "application/graphql"));
         result = response.readEntity(String.class);
         System.out.println(result);
         assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"flights\":[{\"number\":\"LH7689\"}]}}")));
+        assertThat(result, is(equalTo("{\"data\":{\"addPassenger\":{\"id\":\"4\"}}}")));
 
-        query = "mutation{updateFlight(id: 4, flightInput: {number: \"LH7689\", from: \"CHX\", to: \"JFK\"}) {id}}";
 
-        response = target.request().post(Entity.entity(query, "application/graphql"));
-        result = response.readEntity(String.class);
-        System.out.println(result);
-        assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"updateFlight\":{\"id\":\"4\"}}}")));
-
-        query = "{flights(from:\"CHX\"){to}}";
+        query = "{flights(from:\"CHX\"){passengers{name}}}";
 
         response = target.request().post(Entity.entity(query, "application/graphql"));
         result = response.readEntity(String.class);
         System.out.println(result);
         assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"flights\":[{\"to\":\"JFK\"}]}}")));
+        assertThat(result, is(equalTo("{\"data\":{\"flights\":[{\"passengers\":[{\"name\":\"Helga Kirschbaum\"}]}]}}")));
+
+        query = "mutation {\n" +
+                "    flight(number: \"LH7689\") {\n" +
+                "        addPassenger(passengerInput: {\n" +
+                "            name: \"Einer Noch\"\n" +
+                "        }) {\n" +
+                "            id\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+
+        response = target.request().post(Entity.entity(query, "application/graphql"));
+        result = response.readEntity(String.class);
+        System.out.println(result);
+        assertThat(response.getStatus(), is(200));
+        assertThat(result, is(equalTo("{\"data\":{\"flight\":{\"addPassenger\":{\"id\":\"5\"}}}}")));
+
+        query = "{flights(from:\"CHX\"){passengers{name}}}";
+
+        response = target.request().post(Entity.entity(query, "application/graphql"));
+        result = response.readEntity(String.class);
+        System.out.println(result);
+        assertThat(response.getStatus(), is(200));
+        assertThat(result, is(equalTo("{\"data\":{\"flights\":[" + "{\"passengers\":[" +
+                "{\"name\":\"Helga Kirschbaum\"}," +
+                "{\"name\":\"Einer Noch\"}" +
+                "]}]}}")));
+
     }
 
 }

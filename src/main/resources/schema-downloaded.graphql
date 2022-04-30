@@ -1,8 +1,9 @@
-query {
-    flights{
-        id
-        passengers {
-            name
+mutation {
+    flight(number: "NOT THERE") {
+        addPassenger(passengerInput: {
+            name: "Helga Kirschbaum"
+        }) {
+            id
         }
     }
 }
