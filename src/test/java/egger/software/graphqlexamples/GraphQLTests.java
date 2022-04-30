@@ -38,67 +38,28 @@ public class GraphQLTests {
     }
 
     @Test
-    public void run_basic_mutation() {
+    public void run_basic_error() {
         WebTarget target = client.target("http://localhost:" + port).path("graphql");
 
-        String query = "mutation{createFlight(flightInput: {number: \"LH7689\", from: \"CHX\", to: \"AUS\"}) {id}}";
-
-        Response response = target.request().post(Entity.entity(query, "application/graphql"));
-        String result = response.readEntity(String.class);
-        System.out.println(result);
-        assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"createFlight\":{\"id\":\"4\"}}}")));
-
-        query = "mutation {\n" +
-                "    addPassenger(flightId: 4,passengerInput: {\n" +
-                "        name: \"Helga Kirschbaum\"\n" +
-                "    }) {\n" +
-                "        id\n" +
-                "    }\n" +
-                "}";
-
-        response = target.request().post(Entity.entity(query, "application/graphql"));
-        result = response.readEntity(String.class);
-        System.out.println(result);
-        assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"addPassenger\":{\"id\":\"4\"}}}")));
-
-
-        query = "{flights(from:\"CHX\"){passengers{name}}}";
-
-        response = target.request().post(Entity.entity(query, "application/graphql"));
-        result = response.readEntity(String.class);
-        System.out.println(result);
-        assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"flights\":[{\"passengers\":[{\"name\":\"Helga Kirschbaum\"}]}]}}")));
-
-        query = "mutation {\n" +
-                "    flight(number: \"LH7689\") {\n" +
+        String query = "mutation {\n" +
+                "    flight(number: \"NOT THERE\") {\n" +
                 "        addPassenger(passengerInput: {\n" +
-                "            name: \"Einer Noch\"\n" +
+                "            name: \"Max Werauchimmer\"\n" +
                 "        }) {\n" +
                 "            id\n" +
                 "        }\n" +
                 "    }\n" +
                 "}";
 
-        response = target.request().post(Entity.entity(query, "application/graphql"));
-        result = response.readEntity(String.class);
+        Response response = target.request().post(Entity.entity(query, "application/graphql"));
+        String result = response.readEntity(String.class);
         System.out.println(result);
         assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"flight\":{\"addPassenger\":{\"id\":\"5\"}}}}")));
-
-        query = "{flights(from:\"CHX\"){passengers{name}}}";
-
-        response = target.request().post(Entity.entity(query, "application/graphql"));
-        result = response.readEntity(String.class);
-        System.out.println(result);
-        assertThat(response.getStatus(), is(200));
-        assertThat(result, is(equalTo("{\"data\":{\"flights\":[" + "{\"passengers\":[" +
-                "{\"name\":\"Helga Kirschbaum\"}," +
-                "{\"name\":\"Einer Noch\"}" +
-                "]}]}}")));
-
+        assertThat(result, is(equalTo("{\"errors\":[" +
+                "{\"message\":\"Exception while fetching data (/flight) : Flight with number: NOT THERE not found\"," +
+                "\"locations\":[{\"line\":1,\"column\":15}],\"path\":[\"flight\"]," +
+                "\"extensions\":{\"classification\":\"DataFetchingException\"}}]," +
+                "\"data\":{\"flight\":null}}")));
     }
 
 }
